@@ -1,0 +1,96 @@
+networks:
+  mock_mgmt_net:
+    name: mock_mgmt_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.16.0/24
+          gateway: 172.30.16.254
+  mock_l2_net:
+    name: mock_l2_net
+    driver: macvlan
+    driver_opts:
+      parent: ens38
+    ipam:
+      config:
+        - subnet: 192.168.16.0/24
+          gateway: 192.168.16.254
+          aux_addresses:
+            ubuntu_vm: 192.168.16.118
+
+services:
+  mock-switch:
+    build:
+      context: .
+      dockerfile: docker/switch/Dockerfile
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-http://192.168.124.120:7890}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://192.168.124.120:7890}
+        NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,::1}
+    container_name: mock-switch
+    volumes:
+      - ./snmp/config/snmpd.conf:/etc/snmp/snmpd.conf:ro
+      - ./snmp/data/fdb.json:/opt/mock-switch/data/fdb.json:ro
+      - ./snmp/backends/pass_persist/fdb_agent.py:/opt/mock-switch/backends/pass_persist/fdb_agent.py:ro
+    ports:
+      - "161:161/udp"
+    networks:
+      mock_mgmt_net:
+        ipv4_address: 172.30.16.118
+
+  mock-ipc-dh:
+    image: python:3.9-slim
+    container_name: mock-ipc-dh
+    mac_address: "00:11:22:33:44:01"
+    volumes:
+      - ./device_mock.py:/app/device_mock.py:ro
+    working_dir: /app
+    command: python3 -u device_mock.py
+    environment:
+      DEVICE_IP: 192.168.16.101
+      DEVICE_MAC: "00:11:22:33:44:01"
+      DEVICE_MODEL: DH-IPC-HDW2431T
+      DEVICE_NAME: Dahua-IPC-1
+      ENABLE_DH: "1"
+      ENABLE_ONVIF: "0"
+    networks:
+      mock_l2_net:
+        ipv4_address: 192.168.16.101
+
+  mock-ipc-onvif:
+    image: python:3.9-slim
+    container_name: mock-ipc-onvif
+    mac_address: "00:11:22:33:44:02"
+    volumes:
+      - ./device_mock.py:/app/device_mock.py:ro
+    working_dir: /app
+    command: python3 -u device_mock.py
+    environment:
+      DEVICE_IP: 192.168.16.102
+      DEVICE_MAC: "00:11:22:33:44:02"
+      DEVICE_MODEL: ONVIF-NVT-102
+      DEVICE_NAME: ONVIF-IPC
+      ENABLE_DH: "0"
+      ENABLE_ONVIF: "1"
+    networks:
+      mock_l2_net:
+        ipv4_address: 192.168.16.102
+
+  mock-nvr:
+    image: python:3.9-slim
+    container_name: mock-nvr
+    mac_address: "00:11:22:33:44:03"
+    volumes:
+      - ./device_mock.py:/app/device_mock.py:ro
+    working_dir: /app
+    command: python3 -u device_mock.py
+    environment:
+      DEVICE_IP: 192.168.16.200
+      DEVICE_MAC: "00:11:22:33:44:03"
+      DEVICE_MODEL: DH-NVR-4208
+      DEVICE_NAME: Dahua-NVR
+      ENABLE_DH: "1"
+      ENABLE_ONVIF: "0"
+    networks:
+      mock_l2_net:
+        ipv4_address: 192.168.16.200

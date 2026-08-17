@@ -1,0 +1,4 @@
+FROM alpine:latest
+RUN sed -i 's/https/http/g' /etc/apk/repositories && \
+    apk add --no-cache net-snmp
+CMD ["snmpd", "-f", "-Le", "-C", "-I", "-dot1dTpFdbTable", "-c", "/etc/snmp/snmpd.conf"]

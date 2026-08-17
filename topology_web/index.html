@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08111f" />
+    <title>LinkView 网络拓扑</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">LV</div>
+          <div><h1>LinkView</h1><p>网络拓扑监控</p></div>
+        </div>
+        <div class="snapshot-meta">
+          <span class="live-dot"></span>
+          <span id="snapshot-label">正在连接拓扑服务…</span>
+        </div>
+        <div class="actions">
+          <button id="fit-btn" class="ghost-button">适应画布</button>
+          <button id="mode-btn" class="ghost-button" hidden>显示全部</button>
+          <button id="refresh-btn" class="primary-button">刷新快照</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar">
+          <section class="stats-grid">
+            <article><span>节点</span><strong id="node-count">—</strong></article>
+            <article><span>链路</span><strong id="edge-count">—</strong></article>
+            <article><span>交换机</span><strong id="switch-count">—</strong></article>
+            <article><span>终端</span><strong id="device-count">—</strong></article>
+          </section>
+
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="search-input" type="search" placeholder="搜索名称、IP 或 MAC" />
+          </label>
+
+          <section class="legend">
+            <h2>图例</h2>
+            <div><i class="legend-root"></i>核心交换机</div>
+            <div><i class="legend-unmanaged"></i>傻瓜交换机</div>
+            <div><i class="legend-camera"></i>IPC / ONVIF</div>
+            <div><i class="legend-nvr"></i>NVR</div>
+            <div><i class="legend-unknown"></i>未知终端</div>
+          </section>
+
+          <section class="result-panel">
+            <div class="section-heading"><h2>设备</h2><span id="result-count"></span></div>
+            <div id="device-list" class="device-list"></div>
+          </section>
+        </aside>
+
+        <section class="canvas-panel">
+          <div id="graph"></div>
+          <div id="loading" class="loading-card">
+            <div class="spinner"></div>
+            <strong>加载拓扑快照</strong>
+            <span id="loading-detail">正在获取元数据…</span>
+            <div class="progress-track"><i id="progress-bar"></i></div>
+          </div>
+          <div id="error-card" class="error-card" hidden>
+            <strong>拓扑加载失败</strong>
+            <span id="error-message"></span>
+            <button id="retry-btn" class="primary-button">重试</button>
+          </div>
+          <div class="canvas-hint">滚轮缩放 · 拖动画布 · 点击节点查看详情</div>
+        </section>
+
+        <aside id="detail-panel" class="detail-panel" hidden>
+          <button id="detail-close" class="close-button">×</button>
+          <div id="detail-icon" class="detail-icon"></div>
+          <p id="detail-kind" class="eyebrow"></p>
+          <h2 id="detail-title"></h2>
+          <dl id="detail-fields"></dl>
+        </aside>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

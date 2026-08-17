@@ -1,0 +1,53 @@
+networks:
+  mock_topo_net:
+    name: mock_topo_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.16.0/24
+          gateway: 172.30.16.254
+
+services:
+  mock-switch:
+    build:
+      context: .
+      dockerfile: Dockerfile.switch
+    container_name: mock-switch
+    volumes:
+      - ./snmpd.conf:/etc/snmp/snmpd.conf:ro
+      - ./fdb_mock.sh:/etc/snmp/fdb_mock.sh:ro
+    ports:
+      - "161:161/udp"
+    networks:
+      mock_topo_net:
+        ipv4_address: 172.30.16.118
+
+  mock-ipc-dh:
+    image: python:3.9-slim
+    container_name: mock-ipc-dh
+    mac_address: "00:11:22:33:44:01"
+    volumes:
+      - ./dh_mock.py:/app/dh_mock.py
+    working_dir: /app
+    command: python3 dh_mock.py
+    networks:
+      mock_topo_net:
+        ipv4_address: 172.30.16.101
+
+  mock-ipc-onvif:
+    image: python:3.9-slim
+    container_name: mock-ipc-onvif
+    mac_address: "00:11:22:33:44:02"
+    command: tail -f /dev/null
+    networks:
+      mock_topo_net:
+        ipv4_address: 172.30.16.102
+
+  mock-nvr:
+    image: alpine:latest
+    container_name: mock-nvr
+    mac_address: "00:11:22:33:44:03"
+    command: tail -f /dev/null
+    networks:
+      mock_topo_net:
+        ipv4_address: 172.30.16.200

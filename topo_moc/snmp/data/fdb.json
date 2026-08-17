@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "mac": "00:11:22:33:44:01",
+      "port": 5,
+      "description": "Dahua IPC 1 via unmanaged switch"
+    },
+    {
+      "mac": "00:11:22:33:44:02",
+      "port": 5,
+      "description": "ONVIF IPC via unmanaged switch"
+    },
+    {
+      "mac": "00:11:22:33:44:03",
+      "port": 6,
+      "description": "Dahua NVR directly connected"
+    }
+  ]
+}
